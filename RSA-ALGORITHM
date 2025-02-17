@@ -1,0 +1,72 @@
+import random
+
+# Function to find GCD
+def gcd(a, b):
+    while b != 0:
+        a, b = b, a % b
+    return a
+
+# Function to find modular inverse
+def mod_inverse(e, phi):
+    for d in range(2, phi):
+        if (d * e) % phi == 1:
+            return d
+    return None
+
+# Function to check if a number is prime
+def is_prime(n):
+    if n < 2:
+        return False
+    for i in range(2, int(n**0.5) + 1):
+        if n % i == 0:
+            return False
+    return True
+
+# Function to generate a prime number
+def generate_prime():
+    while True:
+        num = random.randint(50, 200)  # Generate random number in range
+        if is_prime(num):
+            return num
+
+# RSA Key Generation
+def generate_keys():
+    p = generate_prime()
+    q = generate_prime()
+    while p == q:
+        q = generate_prime()
+
+    n = p * q
+    phi = (p - 1) * (q - 1)
+
+    e = random.randrange(2, phi)
+    while gcd(e, phi) != 1:
+        e = random.randrange(2, phi)
+
+    d = mod_inverse(e, phi)
+
+    return ((e, n), (d, n))
+
+# RSA Encryption
+def encrypt(plaintext, public_key):
+    e, n = public_key
+    ciphertext = [(ord(char) ** e) % n for char in plaintext]
+    return ciphertext
+
+# RSA Decryption
+def decrypt(ciphertext, private_key):
+    d, n = private_key
+    decrypted_text = ''.join([chr((char ** d) % n) for char in ciphertext])
+    return decrypted_text
+
+# Example Usage
+public_key, private_key = generate_keys()
+print("Public Key:", public_key)
+print("Private Key:", private_key)
+
+message = "HELLO"
+encrypted_msg = encrypt(message, public_key)
+print("Encrypted Message:", encrypted_msg)
+
+decrypted_msg = decrypt(encrypted_msg, private_key)
+print("Decrypted Message:", decrypted_msg)
